@@ -24,7 +24,7 @@ int hexconv_convert_bin_to_str(const char *srcfile,
         prefix  = prefix  ? prefix  : "";
         postfix = postfix ? postfix : "";
 
-        if( !cmddata_read(&src, srcfile) ) JMPBK_THROW(HEXCONV_ERR_READ_FILE);
+        if( !cmddata_read(&src, false, srcfile) ) JMPBK_THROW(HEXCONV_ERR_READ_FILE);
 
         size_t sizeneed = src.size * ( strlen(prefix) + 2 + strlen(postfix) ) + 1;
         if( !mem_resize(&dest, sizeneed) ) JMPBK_THROW(HEXCONV_ERR_MEM_ALLOC);
@@ -37,7 +37,6 @@ int hexconv_convert_bin_to_str(const char *srcfile,
                                          postfix);
         if( !count ) JMPBK_THROW(HEXCONV_ERR_INPUT_FORMAT);
         count = strlen((char*)dest.buf);
-        if( !mem_resize(&dest, count) ) JMPBK_THROW(HEXCONV_ERR_MEM_ALLOC);
 
         if( cntmode )
         {
@@ -46,7 +45,7 @@ int hexconv_convert_bin_to_str(const char *srcfile,
             if( !mem_import(&dest, str, strlen(str)) ) JMPBK_THROW(HEXCONV_ERR_MEM_ALLOC);
         }
 
-        if( !cmddata_write(&dest, destfile) ) JMPBK_THROW(HEXCONV_ERR_WRITE_FILE);
+        if( !cmddata_write(&dest, true, destfile) ) JMPBK_THROW(HEXCONV_ERR_WRITE_FILE);
     }
     JMPBK_CATCH_ALL
     {
@@ -77,8 +76,7 @@ int hexconv_convert_str_to_bin(const char *srcfile,
     int res;
     JMPBK_BEGIN
     {
-        if( !cmddata_read(&src, srcfile) ) JMPBK_THROW(HEXCONV_ERR_READ_FILE);
-        if( !mem_append(&src, "\0", 1) ) JMPBK_THROW(HEXCONV_ERR_MEM_ALLOC);
+        if( !cmddata_read(&src, true, srcfile) ) JMPBK_THROW(HEXCONV_ERR_READ_FILE);
 
         if( !mem_resize(&dest, src.size) ) JMPBK_THROW(HEXCONV_ERR_MEM_ALLOC);
         size_t count = str_hexstr_to_bin(dest.buf, dest.size, (char*)src.buf, true);
@@ -92,7 +90,7 @@ int hexconv_convert_str_to_bin(const char *srcfile,
             if( !mem_import(&dest, str, strlen(str)) ) JMPBK_THROW(HEXCONV_ERR_MEM_ALLOC);
         }
 
-        if( !cmddata_write(&dest, destfile) ) JMPBK_THROW(HEXCONV_ERR_WRITE_FILE);
+        if( !cmddata_write(&dest, false, destfile) ) JMPBK_THROW(HEXCONV_ERR_WRITE_FILE);
     }
     JMPBK_CATCH_ALL
     {

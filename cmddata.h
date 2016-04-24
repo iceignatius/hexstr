@@ -10,8 +10,8 @@
 extern "C" {
 #endif
 
-bool cmddata_read(mem_t *mem, const char *filename);
-bool cmddata_write(const mem_t *mem, const char *filename);
+bool cmddata_read(mem_t *mem, bool isstr, const char *filename);
+bool cmddata_write(const mem_t *mem, bool isstr, const char *filename);
 
 #ifdef __cplusplus
 }  // extern "C"

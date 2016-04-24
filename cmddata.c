@@ -1,9 +1,10 @@
+#include <string.h>
 #include <stdio.h>
 #include <gen/jmpbk.h>
 #include "cmddata.h"
 
 //------------------------------------------------------------------------------
-bool cmddata_read(mem_t *mem, const char *filename)
+bool cmddata_read(mem_t *mem, bool isstr, const char *filename)
 {
     mem_clear(mem);
 
@@ -30,6 +31,12 @@ bool cmddata_read(mem_t *mem, const char *filename)
                 JMPBK_THROW(0);
             }
         }
+
+        if( isstr && !mem_append(mem, "\0", 1) )
+        {
+            fprintf(stderr, "ERROR : No more memory!");
+            JMPBK_THROW(0);
+        }
     }
     JMPBK_FINAL
     {
@@ -42,7 +49,7 @@ bool cmddata_read(mem_t *mem, const char *filename)
     return res;
 }
 //------------------------------------------------------------------------------
-bool cmddata_write(const mem_t *mem, const char *filename)
+bool cmddata_write(const mem_t *mem, bool isstr, const char *filename)
 {
     FILE *file = NULL;
 
@@ -57,7 +64,8 @@ bool cmddata_write(const mem_t *mem, const char *filename)
 
         FILE *stream = file ? file : stdout;
 
-        if( mem->size != fwrite(mem->buf, 1, mem->size, stream) )
+        size_t datasize = isstr ? strlen((char*)mem->buf) : mem->size;
+        if( datasize != fwrite(mem->buf, 1, datasize, stream) )
         {
             fprintf(stderr, "ERROR : File IO error!\n");
             JMPBK_THROW(0);
